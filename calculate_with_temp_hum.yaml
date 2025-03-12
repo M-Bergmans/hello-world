@@ -1,0 +1,28 @@
+blueprint:
+  name: calculations with temperature & humidity
+  description: Creates 3 sensors with Absolute Humidity, Dew Point and VDC
+  domain: template
+  source_url: https://github.com/home-assistant/core/blob/dev/homeassistant/components/template/blueprints/calculate_with_temp_hum.yaml.yaml
+  input:
+    temperature_entity:
+      name: Temperature sensor to be used.
+      description: The Temperature sensor used for the calculations
+      selector:
+        entity:
+          domain: sensor
+    humidity_entity:
+      name: humidity sensor to be used.
+      description: The Temperature sensor used for the calculations
+      selector:
+        entity:
+          domain: sensor
+variables:
+  temperature_entity: !input temperature_entity
+  humidity_entity: !input humidity_entity
+sensor:
+  icon: mdi:water
+  unit_of_measurement: "g/m³"
+  state: >
+    {% set T = states(temperature_entity) | float(0) %}
+    {% set RH = states(humidity_entity) | float(0) %}
+    {{ (6.112 * e**((17.67 * T) / (T + 243.5)) * RH * 2.1674) / (273.15 + T) | round(2) }}
